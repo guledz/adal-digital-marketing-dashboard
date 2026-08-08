@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAL DIGITAL — Eastern Ethiopia Technology Demand Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #f8f9fc;
+            --surface: #ffffff;
+            --text: #1a1d28;
+            --text-secondary: #5a5f72;
+            --border: #e2e5ee;
+            --primary: #1e3a5f;
+            --primary-light: #2c5282;
+            --accent: #0d9488;
+            --accent-light: #14b8a6;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --success: #059669;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --sidebar-bg: #0f1a2e;
+            --sidebar-text: #c8cdd8;
+            --sidebar-active: #14b8a6;
+            --sidebar-hover: #1a2d47;
+            --transition: 180ms ease;
+        }
+        [data-bs-theme="dark"] {
+            --bg: #111827;
+            --surface: #1a2235;
+            --text: #e2e6f0;
+            --text-secondary: #9ca3b8;
+            --border: #2a3347;
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+            --sidebar-bg: #080d18;
+            --sidebar-hover: #1a2740;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            transition: background var(--transition), color var(--transition);
+        }
+        .sidebar {
+            width: 260px;
+            min-width: 260px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1040;
+            transition: transform var(--transition);
+            overflow-y: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .sidebar-brand {
+            padding: 1.25rem 1.25rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+        .sidebar-brand h4 {
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+            font-size: 1.15rem;
+        }
+        .sidebar-brand small {
+            color: #8b93a8;
+            font-size: 0.68rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.55rem 0.85rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .sidebar-nav a:hover {
+            background: var(--sidebar-hover);
+            color: #e2e6f0;
+        }
+        .sidebar-nav a.active {
+            background: rgba(20, 184, 166, 0.15);
+            color: var(--sidebar-active);
+            font-weight: 600;
+        }
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .sidebar-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-align: center;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 1.5rem;
+            min-height: 100vh;
+            transition: margin var(--transition);
+        }
+        .view-section {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem 1.25rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition);
+        }
+        .card-stat .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .card-stat .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+        .card-stat .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .table-container {
+            background: var(--surface);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        .table-container table {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+        .table-container thead th {
+            background: var(--bg);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--border);
+            padding: 0.65rem 0.75rem;
+            white-space: nowrap;
+        }
+        .table-container tbody td {
+            padding: 0.6rem 0.75rem;
+            vertical-align: middle;
+            border-color: var(--border);
+        }
+        .badge-status {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.3em 0.65em;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+        }
+        .kanban-board {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-bottom: 0.75rem;
+        }
+        .kanban-column {
+            min-width: 220px;
+            max-width: 260px;
+            background: var(--bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            padding: 0.65rem;
+            flex-shrink: 0;
+        }
+        .kanban-column h6 {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+        .kanban-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0.6rem 0.7rem;
+            margin-bottom: 0.45rem;
+            cursor: grab;
+            font-size: 0.78rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition);
+        }
+        .kanban-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .kanban-card.dragging {
+            opacity: 0.5;
+        }
+        .modal-content {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+        }
+        .modal-header {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+        }
+        .btn-soft {
+            border-radius: 7px;
+            font-weight: 500;
+            font-size: 0.82rem;
+            padding: 0.4rem 0.9rem;
+            transition: all var(--transition);
+        }
+        .form-control,
+        .form-select {
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            padding: 0.5rem 0.7rem;
+            background: var(--surface);
+            color: var(--text);
+            transition: all var(--transition);
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+        .readiness-bar {
+            height: 8px;
+            border-radius: 10px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        .readiness-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .kanban-board {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            .kanban-column {
+                min-width: 180px;
+                max-width: 200px;
+            }
+        }
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1050;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 0.7rem;
+            font-size: 1.2rem;
+        }
+        @media (max-width: 991px) {
+            .mobile-toggle {
+                display: block;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+        @media print {
+            .sidebar,
+            .mobile-toggle,
+            .no-print {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+            .print-only {
+                display: block;
+            }
+            .card-stat,
+            .table-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h4>ADAL DIGITAL</h4>
+            <small>Eastern Ethiopia Technology Demand Intelligence</small>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a data-view="dashboard" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a data-view="organizations"><i class="fas fa-building"></i> Organizations</a>
+            <a data-view="market-research"><i class="fas fa-magnifying-glass"></i> Market Research</a>
+            <a data-view="digital-assessment"><i class="fas fa-gauge-high"></i> Digital Assessment</a>
+            <a data-view="problems"><i class="fas fa-triangle-exclamation"></i> Problems</a>
+            <a data-view="opportunities"><i class="fas fa-lightbulb"></i> Opportunities</a>
+            <a data-view="pipeline"><i class="fas fa-funnel-dollar"></i> Sales Pipeline</a>
+            <a data-view="requirements"><i class="fas fa-file-lines"></i> Requirements</a>
+            <a data-view="partners"><i class="fas fa-handshake"></i> Technology Partners</a>
+            <a data-view="campaigns"><i class="fas fa-bullhorn"></i> Campaigns</a>
+            <a data-view="tasks"><i class="fas fa-list-check"></i> Tasks</a>
+            <a data-view="reports"><i class="fas fa-file-pdf"></i> Reports</a>
+            <a data-view="market-intel"><i class="fas fa-chart-line"></i> Market Intelligence</a>
+            <a data-view="settings"><i class="fas fa-gear"></i> Settings</a>
+        </nav>
+        <div class="sidebar-footer">© 2026 Adal Digital<br>Founder: Guled Hassen<br><small>v1.0 — Local Prototype</small></div>
+    </aside>
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard View -->
+        <section class="view-section active" id="view-dashboard">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                    <h4 class="fw-bold mb-0">Good day, Guled</h4>
+                    <small class="text-muted">Eastern Ethiopia Technology Demand Overview</small>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="loadDemoData()"><i class="fas fa-database me-1"></i> Load Demo Data</button>
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="exportAllJSON()"><i class="fas fa-download me-1"></i> Backup</button>
+                    <button class="btn btn-sm btn-soft" id="themeToggle" style="background:var(--primary);color:#fff;" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+            <div class="row g-3 mb-3" id="kpiCards"></div>
+            <div class="row g-3 mb-3">
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold mb-2">Organizations by City</h6><canvas id="chartCity" height="200"></canvas></div></div>
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold mb-2">Organizations by Industry</h6><canvas id="chartIndustry" height="200"></canvas></div></div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold mb-2">Lead Pipeline</h6><canvas id="chartPipeline" height="200"></canvas></div></div>
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold mb-2">Technology Demand</h6><canvas id="chartTechDemand" height="200"></canvas></div></div>
+            </div>
+            <div class="row g-3">
+                <div class="col-12"><div class="table-container p-3"><h6 class="fw-semibold mb-2">Opportunity Value Summary</h6>
+                        <div class="row g-2" id="oppValueSummary"></div></div></div>
+            </div>
+        </section>
+        <!-- Organizations View -->
+        <section class="view-section" id="view-organizations">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0"><i class="fas fa-building me-2"></i>Organization Database</h5>
+                <div class="d-flex gap-2"><input type="text" class="form-control form-control-sm" placeholder="Search..." id="orgSearch" oninput="renderOrgTable()" style="width:200px;"><button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" onclick="openOrgModal()"><i class="fas fa-plus me-1"></i> Add</button></div>
+            </div>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="orgTable"><thead><tr><th>Name</th><th>Type</th><th>Industry</th><th>City</th><th>Digital Readiness</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <!-- Market Research View -->
+        <section class="view-section" id="view-market-research">
+            <h5 class="fw-bold mb-3"><i class="fas fa-magnifying-glass me-2"></i>Market Research</h5>
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <div class="table-container p-3"><h6 class="fw-semibold">Research Records</h6><div style="overflow-x:auto;"><table class="table table-sm" id="researchTable"><thead><tr><th>Organization</th><th>Researcher</th><th>Date</th><th>Location</th><th>Industry</th><th>Problem Found</th><th>Actions</th></tr></thead><tbody></tbody></table></div></div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="table-container p-3"><h6 class="fw-semibold">New Research Entry</h6>
+                        <form id="researchForm" onsubmit="submitResearch(event)" class="d-flex flex-column gap-2">
+                            <select class="form-select form-select-sm" id="resOrg" required><option value="">Select Organization</option></select>
+                            <input class="form-control form-control-sm" placeholder="Researcher name" id="resResearcher" required>
+                            <input class="form-control form-control-sm" type="date" id="resDate" required>
+                            <input class="form-control form-control-sm" placeholder="Location" id="resLocation">
+                            <input class="form-control form-control-sm" placeholder="Industry" id="resIndustry">
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="Current operations notes" id="resOps"></textarea>
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="Problem in customer's own words" id="resProblem"></textarea>
+                            <input class="form-control form-control-sm" placeholder="Frequency" id="resFreq">
+                            <select class="form-select form-select-sm" id="resSeverity"><option>Low</option><option>Medium</option><option selected>High</option><option>Critical</option></select>
+                            <button type="submit" class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;">Save Research</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Digital Assessment View -->
+        <section class="view-section" id="view-digital-assessment">
+            <h5 class="fw-bold mb-3"><i class="fas fa-gauge-high me-2"></i>Adal Digital Readiness Score</h5>
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="table-container p-3"><h6 class="fw-semibold">Assess Organization</h6>
+                        <select class="form-select form-select-sm mb-2" id="assessOrg" onchange="loadAssessment()"><option value="">Choose organization...</option></select>
+                        <div id="assessmentForm" class="d-flex flex-column gap-2"></div>
+                        <button class="btn btn-sm btn-soft mt-2" style="background:var(--accent);color:#fff;" onclick="saveAssessment()">Calculate & Save Score</button>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="table-container p-3" id="assessmentResult"><h6 class="fw-semibold">Result</h6><p class="text-muted">Select an organization and complete the assessment.</p></div>
+                </div>
+            </div>
+        </section>
+        <!-- Problems View -->
+        <section class="view-section" id="view-problems">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0"><i class="fas fa-triangle-exclamation me-2"></i>Business Problems Database</h5>
+                <button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" onclick="openProblemModal()"><i class="fas fa-plus me-1"></i> Add Problem</button>
+            </div>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="problemTable"><thead><tr><th>Organization</th><th>Title</th><th>Industry</th><th>City</th><th>Urgency</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <!-- Opportunities View -->
+        <section class="view-section" id="view-opportunities">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0"><i class="fas fa-lightbulb me-2"></i>Technology Opportunities</h5>
+                <button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" onclick="openOppModal()"><i class="fas fa-plus me-1"></i> Add Opportunity</button>
+            </div>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="oppTable"><thead><tr><th>Name</th><th>Organization</th><th>Solution</th><th>Value (ETB)</th><th>Probability</th><th>Weighted</th><th>Stage</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <!-- Pipeline Kanban View -->
+        <section class="view-section" id="view-pipeline">
+            <h5 class="fw-bold mb-3"><i class="fas fa-funnel-dollar me-2"></i>Sales Pipeline Kanban</h5>
+            <div class="kanban-board" id="kanbanBoard"></div>
+        </section>
+        <!-- Requirements View -->
+        <section class="view-section" id="view-requirements">
+            <h5 class="fw-bold mb-3"><i class="fas fa-file-lines me-2"></i>Requirements Brief Generator</h5>
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <div class="table-container p-3"><h6 class="fw-semibold">Generate Brief</h6>
+                        <form id="reqForm" onsubmit="generateBrief(event)" class="d-flex flex-column gap-2">
+                            <select class="form-select form-select-sm" id="reqOpp" required><option value="">Select Opportunity</option></select>
+                            <input class="form-control form-control-sm" placeholder="Project name" id="reqProject" required>
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="Business problem" id="reqProblem"></textarea>
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="Objectives" id="reqObjectives"></textarea>
+                            <input class="form-control form-control-sm" placeholder="Target users" id="reqUsers">
+                            <input class="form-control form-control-sm" placeholder="Platform (Web, Mobile, etc.)" id="reqPlatform">
+                            <textarea class="form-control form-control-sm" rows="2" placeholder="Core features" id="reqFeatures"></textarea>
+                            <input class="form-control form-control-sm" placeholder="Budget (ETB)" id="reqBudget">
+                            <input class="form-control form-control-sm" placeholder="Expected timeline" id="reqTimeline">
+                            <button type="submit" class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;">Generate Requirements Brief</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="table-container p-3" id="briefOutput"><h6 class="fw-semibold">Generated Brief</h6><p class="text-muted">Fill the form and generate a brief.</p></div>
+                </div>
+            </div>
+        </section>
+        <!-- Partners View -->
+        <section class="view-section" id="view-partners">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0"><i class="fas fa-handshake me-2"></i>Technology Partner Database</h5>
+                <button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" onclick="openPartnerModal()"><i class="fas fa-plus me-1"></i> Add Partner</button>
+            </div>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="partnerTable"><thead><tr><th>Name</th><th>Company</th><th>Specialization</th><th>Country</th><th>Reliability</th><th>Match Potential</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+            <div class="table-container p-3 mt-3" id="matchResults"><h6 class="fw-semibold">Partner Matching</h6><p class="text-muted">Select an opportunity from the Requirements tab to find matching partners.</p></div>
+        </section>
+        <!-- Campaigns View -->
+        <section class="view-section" id="view-campaigns">
+            <h5 class="fw-bold mb-3"><i class="fas fa-bullhorn me-2"></i>Campaign Management</h5>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="campaignTable"><thead><tr><th>Campaign</th><th>Target</th><th>Contacted</th><th>Responses</th><th>Qualified</th><th>Proposals</th><th>Won</th><th>Revenue</th><th>Conv. Rate</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <!-- Tasks View -->
+        <section class="view-section" id="view-tasks">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0"><i class="fas fa-list-check me-2"></i>Tasks & Follow-ups</h5>
+                <button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" onclick="openTaskModal()"><i class="fas fa-plus me-1"></i> Add Task</button>
+            </div>
+            <div class="table-container" style="overflow-x:auto;"><table class="table table-hover" id="taskTable"><thead><tr><th>Task</th><th>Organization</th><th>Opportunity</th><th>Due Date</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </section>
+        <!-- Reports View -->
+        <section class="view-section" id="view-reports">
+            <h5 class="fw-bold mb-3"><i class="fas fa-file-pdf me-2"></i>Reporting Center</h5>
+            <div class="row g-3" id="reportCards"></div>
+            <div class="table-container p-3 mt-3 no-print" id="reportPreview"><h6 class="fw-semibold">Report Preview</h6><p class="text-muted">Select a report type to generate.</p></div>
+            <div class="print-only" id="printReport"></div>
+        </section>
+        <!-- Market Intelligence View -->
+        <section class="view-section" id="view-market-intel">
+            <h5 class="fw-bold mb-3"><i class="fas fa-chart-line me-2"></i>Market Intelligence</h5>
+            <div class="row g-3 mb-3" id="marketIntelStats"></div>
+            <div class="row g-3">
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold">Top Problems by Industry</h6><canvas id="chartProblemsIndustry" height="200"></canvas></div></div>
+                <div class="col-lg-6"><div class="table-container p-3"><h6 class="fw-semibold">Digital Maturity Distribution</h6><canvas id="chartMaturity" height="200"></canvas></div></div>
+            </div>
+            <div class="table-container p-3 mt-3"><h6 class="fw-semibold">Demand Summary Table</h6><div style="overflow-x:auto;"><table class="table table-sm" id="intelTable"><thead><tr><th>Category</th><th>Count</th><th>Est. Value (ETB)</th><th>Avg. Readiness</th></tr></thead><tbody></tbody></table></div></div>
+        </section>
+        <!-- Settings View -->
+        <section class="view-section" id="view-settings">
+            <h5 class="fw-bold mb-3"><i class="fas fa-gear me-2"></i>Settings</h5>
+            <div class="table-container p-3">
+                <h6>Data Management</h6>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-sm btn-soft" style="background:var(--primary);color:#fff;" onclick="exportAllJSON()"><i class="fas fa-download me-1"></i> Export All Data (JSON Backup)</button>
+                    <button class="btn btn-sm btn-soft btn-outline-secondary" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload me-1"></i> Import Backup</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importJSON(event)">
+                    <button class="btn btn-sm btn-soft btn-outline-danger" onclick="if(confirm('Clear ALL data? This cannot be undone.')){clearAllData();}"><i class="fas fa-trash me-1"></i> Clear All Data</button>
+                </div>
+                <h6>CSV Export</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="exportCSV('organizations')">Organizations CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="exportCSV('opportunities')">Opportunities CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="exportCSV('problems')">Problems CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="exportCSV('partners')">Partners CSV</button>
+                </div>
+                <hr>
+                <h6>About the Project</h6>
+                <p><strong>Guled Hassen</strong> — Founder & Director, Adal Digital</p>
+                <p class="text-muted">Business development, digital marketing and technology-demand generation focused on connecting organizations with practical digital solutions.</p>
+                <p class="text-muted small">Creating technology demand by understanding real business problems. This is a frontend/local-data prototype v1.0.</p>
+            </div>
+        </section>
+    </main>
+    <!-- Modals -->
+    <div class="modal fade" id="genericModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content" id="genericModalContent"></div></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== DATA STORE ====================
+        const STORAGE_KEY = 'adal_digital_data';
+        let appData = {
+            organizations: [],
+            research: [],
+            assessments: [],
+            problems: [],
+            opportunities: [],
+            partners: [],
+            campaigns: [],
+            tasks: [],
+            requirements: []
+        };
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try { appData = JSON.parse(raw); } catch (e) { console.error('Data parse error'); }
+            }
+            if (!appData.organizations) appData.organizations = [];
+            if (!appData.research) appData.research = [];
+            if (!appData.assessments) appData.assessments = [];
+            if (!appData.problems) appData.problems = [];
+            if (!appData.opportunities) appData.opportunities = [];
+            if (!appData.partners) appData.partners = [];
+            if (!appData.campaigns) appData.campaigns = [];
+            if (!appData.tasks) appData.tasks = [];
+            if (!appData.requirements) appData.requirements = [];
+        }
+
+        function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
+
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toastContainer');
+            const bg = type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#d97706';
+            const el = document.createElement('div');
+            el.className = 'alert text-white py-2 px-3 mb-1';
+            el.style.cssText = `background:${bg};border-radius:8px;font-size:0.85rem;animation:fadeIn 0.3s ease;`;
+            el.textContent = msg;
+            t.appendChild(el);
+            setTimeout(() => { el.remove(); }, 3000);
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigateTo(view) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('#sidebarNav a').forEach(a => a.classList.remove('active'));
+            const section = document.getElementById('view-' + view);
+            if (section) section.classList.add('active');
+            const link = document.querySelector(`#sidebarNav a[data-view="${view}"]`);
+            if (link) link.classList.add('active');
+            document.getElementById('sidebar').classList.remove('open');
+            refreshView(view);
+        }
+
+        function refreshView(view) {
+            switch (view) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'organizations':
+                    renderOrgTable();
+                    break;
+                case 'market-research':
+                    renderResearch();
+                    break;
+                case 'digital-assessment':
+                    renderAssessmentView();
+                    break;
+                case 'problems':
+                    renderProblemTable();
+                    break;
+                case 'opportunities':
+                    renderOppTable();
+                    break;
+                case 'pipeline':
+                    renderKanban();
+                    break;
+                case 'requirements':
+                    renderRequirementsView();
+                    break;
+                case 'partners':
+                    renderPartnerTable();
+                    break;
+                case 'campaigns':
+                    renderCampaigns();
+                    break;
+                case 'tasks':
+                    renderTaskTable();
+                    break;
+                case 'reports':
+                    renderReports();
+                    break;
+                case 'market-intel':
+                    renderMarketIntel();
+                    break;
+            }
+        }
+
+        document.getElementById('sidebarNav').addEventListener('click', function(e) {
+            const a = e.target.closest('a');
+            if (a && a.dataset.view) {
+                e.preventDefault();
+                navigateTo(a.dataset.view);
+            }
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==================== THEME ====================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-bs-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', next);
+            const btn = document.getElementById('themeToggle');
+            btn.innerHTML = next === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('adal_theme', next);
+        }
+        const savedTheme = localStorage.getItem('adal_theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        document.getElementById('themeToggle').innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' :
+            '<i class="fas fa-moon"></i>';
+
+        // ==================== MODAL HELPERS ====================
+        function openModal(title, bodyHTML, saveCallback) {
+            const modal = new bootstrap.Modal(document.getElementById('genericModal'));
+            const content = document.getElementById('genericModalContent');
+            content.innerHTML = `
+            <div class="modal-header"><h5 class="modal-title">${title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">${bodyHTML}</div>
+            <div class="modal-footer"><button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-sm btn-soft" style="background:var(--accent);color:#fff;" id="modalSaveBtn">Save</button></div>
+          `;
+            if (saveCallback) {
+                document.getElementById('modalSaveBtn').addEventListener('click', () => {
+                    saveCallback();
+                    modal.hide();
+                });
+            }
+            modal.show();
+        }
+
+        function getModalValue(sel) { const el = document.getElementById(sel); return el ? el.value : ''; }
+
+        // ==================== DASHBOARD ====================
+        function renderDashboard() {
+            const orgs = appData.organizations;
+            const opps = appData.opportunities;
+            const problems = appData.problems;
+            const activeLeads = opps.filter(o => !['Won', 'Lost'].includes(o.stage)).length;
+            const qualifiedOpps = opps.filter(o => ['Qualified', 'Requirements', 'Proposal', 'Negotiation'].includes(o
+                .stage)).length;
+            const pipelineValue = opps.filter(o => !['Won', 'Lost'].includes(o.stage)).reduce((s, o) => s + (parseFloat(o
+                .estimatedValue) || 0), 0);
+            const proposals = opps.filter(o => o.stage === 'Proposal').length;
+            const wonProjects = opps.filter(o => o.stage === 'Won').length;
+            const wonRevenue = opps.filter(o => o.stage === 'Won').reduce((s, o) => s + (parseFloat(o.estimatedValue) || 0),
+                0);
+            const avgReadiness = orgs.length > 0 ? Math.round(orgs.reduce((s, o) => s + (o.digitalReadiness || 0), 0) / orgs
+                .length) : 0;
+            const weightedPipeline = opps.filter(o => !['Won', 'Lost'].includes(o.stage)).reduce((s, o) => s + ((parseFloat(o
+                .estimatedValue) || 0) * (parseFloat(o.probability) || 0) / 100), 0);
+
+            document.getElementById('kpiCards').innerHTML = [
+                { icon: 'fa-building', color: '#1e3a5f', val: orgs.length, label: 'Organizations Researched' },
+                { icon: 'fa-user-check', color: '#2c5282', val: activeLeads, label: 'Active Leads' },
+                { icon: 'fa-star', color: '#d97706', val: qualifiedOpps, label: 'Qualified Opportunities' },
+                { icon: 'fa-money-bill-trend-up', color: '#059669', val: 'ETB ' + pipelineValue.toLocaleString(),
+                    label: 'Pipeline Value' },
+                { icon: 'fa-file-signature', color: '#0d9488', val: proposals, label: 'Proposals' },
+                { icon: 'fa-trophy', color: '#7c3aed', val: wonProjects, label: 'Won Projects' },
+                { icon: 'fa-coins', color: '#059669', val: 'ETB ' + wonRevenue.toLocaleString(), label: 'Estimated Revenue' },
+                { icon: 'fa-gauge', color: '#dc2626', val: avgReadiness + '/100', label: 'Avg Digital Readiness' },
+            ].map(c => `
+            <div class="col-xl-3 col-lg-4 col-sm-6"><div class="card-stat d-flex align-items-center gap-3">
+              <div class="stat-icon" style="background:${c.color}20;color:${c.color};"><i class="fas ${c.icon}"></i></div>
+              <div><div class="stat-value">${c.val}</div><div class="stat-label">${c.label}</div></div>
+            </div></div>`).join('');
+
+            document.getElementById('oppValueSummary').innerHTML = `
+            <div class="col-md-4"><div class="card-stat text-center"><div class="stat-label">Total Pipeline</div><div class="stat-value">ETB ${pipelineValue.toLocaleString()}</div></div></div>
+            <div class="col-md-4"><div class="card-stat text-center"><div class="stat-label">Weighted Pipeline</div><div class="stat-value">ETB ${weightedPipeline.toLocaleString()}</div></div></div>
+            <div class="col-md-4"><div class="card-stat text-center"><div class="stat-label">Won Revenue</div><div class="stat-value">ETB ${wonRevenue.toLocaleString()}</div></div></div>`;
+
+            renderDashboardCharts(orgs, opps);
+        }
+
+        let chartInstances = {};
+
+        function destroyChart(key) { if (chartInstances[key]) { chartInstances[key].destroy();
+                chartInstances[key] = null; } }
+
+        function renderDashboardCharts(orgs, opps) {
+            const cities = {};
+            orgs.forEach(o => { const c = o.city || 'Other';
+                cities[c] = (cities[c] || 0) + 1; });
+            const industries = {};
+            orgs.forEach(o => { const i = o.industry || 'Unknown';
+                industries[i] = (industries[i] || 0) + 1; });
+            const stages = ['New', 'Contacted', 'Interested', 'Discovery', 'Qualified', 'Requirements', 'Proposal',
+                'Negotiation', 'Won', 'Lost'
+            ];
+            const stageCounts = stages.map(s => opps.filter(o => o.stage === s).length);
+            const techDemand = { 'Websites': 0, 'Mobile Apps': 0, 'Custom Software': 0, 'CRM': 0, 'ERP': 0, 'Booking Systems': 0,
+                'E-commerce': 0, 'AI': 0, 'Automation': 0, 'Data Systems': 0, 'GIS': 0, 'Digital Marketing': 0 };
+            opps.forEach(o => {
+                const cat = o.solutionCategory;
+                if (cat && techDemand.hasOwnProperty(cat)) techDemand[cat]++;
+                else if (cat) techDemand[cat] = (techDemand[cat] || 0) + 1;
+            });
+
+            destroyChart('city');
+            destroyChart('industry');
+            destroyChart('pipeline');
+            destroyChart('techdemand');
+            const ctx1 = document.getElementById('chartCity')?.getContext('2d');
+            if (ctx1) chartInstances['city'] = new Chart(ctx1, { type: 'bar', data: { labels: Object.keys(cities), datasets: [
+                    { label: 'Organizations', data: Object.values(cities),
+                        backgroundColor: ['#1e3a5f', '#2c5282', '#0d9488', '#d97706', '#7c3aed', '#059669'] }] },
+                options: { responsive: true, plugins: { legend: { display: false } } } });
+            const ctx2 = document.getElementById('chartIndustry')?.getContext('2d');
+            if (ctx2) chartInstances['industry'] = new Chart(ctx2, { type: 'doughnut', data: { labels: Object.keys(
+                    industries), datasets: [{ data: Object.values(industries),
+                    backgroundColor: ['#1e3a5f', '#2c5282', '#0d9488', '#d97706', '#7c3aed', '#059669', '#dc2626',
+                        '#3b82f6', '#14b8a6', '#f59e0b'
+                    ] }] }, options: { responsive: true } });
+            const ctx3 = document.getElementById('chartPipeline')?.getContext('2d');
+            if (ctx3) chartInstances['pipeline'] = new Chart(ctx3, { type: 'bar', data: { labels: stages, datasets: [{ label: 'Leads',
+                        data: stageCounts,
+                        backgroundColor: '#1e3a5f' }] }, options: { responsive: true, plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { font: { size: 9 } } } } } });
+            const ctx4 = document.getElementById('chartTechDemand')?.getContext('2d');
+            const tdLabels = Object.keys(techDemand).filter(k => techDemand[k] > 0);
+            const tdValues = tdLabels.map(k => techDemand[k]);
+            if (ctx4) chartInstances['techdemand'] = new Chart(ctx4, { type: 'bar', data: { labels: tdLabels.length > 0 ?
+                        tdLabels : ['No data'], datasets: [{ label: 'Demand Count', data: tdValues.length > 0 ? tdValues : [0],
+                        backgroundColor: '#0d9488' }] }, options: { responsive: true, indexAxis: 'y',
+                    plugins: { legend: { display: false } } } });
+        }
+
+        // ==================== ORGANIZATIONS ====================
+        function renderOrgTable(filter = '') {
+            const tbody = document.querySelector('#orgTable tbody');
+            let orgs = appData.organizations;
+            if (filter) { const q = filter.toLowerCase();
+                orgs = orgs.filter(o => (o.name || '').toLowerCase().includes(q) || (o.industry || '').toLowerCase().includes(
+                    q) || (o.city || '').toLowerCase().includes(q)); }
+            tbody.innerHTML = orgs.map(o => `
+            <tr>
+              <td><strong>${o.name||''}</strong></td>
+              <td>${o.orgType||''}</td>
+              <td>${o.industry||''}</td>
+              <td>${o.city||''}</td>
+              <td><div class="readiness-bar" style="width:80px;"><div class="readiness-fill" style="width:${o.digitalReadiness||0}%;background:${o.digitalReadiness>60?'#059669':o.digitalReadiness>30?'#d97706':'#dc2626'};"></div></div><small>${o.digitalReadiness||0}/100</small></td>
+              <td><span class="badge-status bg-secondary">Active</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-secondary btn-soft" onclick="editOrg('${o.id}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger btn-soft" onclick="deleteOrg('${o.id}')"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>`).join('');
+            if (orgs.length === 0) tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center text-muted py-3">No organizations found. Add some or load demo data.</td></tr>';
+        }
+        document.getElementById('orgSearch').addEventListener('input', function() { renderOrgTable(this.value); });
+
+        function openOrgModal(editId = null) {
+            const existing = editId ? appData.organizations.find(o => o.id === editId) : null;
+            const body = `
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Organization Name*</label><input class="form-control form-control-sm" id="orgName" value="${existing?.name||''}" required></div>
+              <div class="col-md-6"><label class="form-label small">Type</label><select class="form-select form-select-sm" id="orgType"><option>Business</option><option>NGO</option><option>Government</option><option>Startup</option><option>School</option><option>Hotel</option><option>Restaurant</option><option>Manufacturer</option><option>Logistics</option><option>Professional Service</option></select></div>
+              <div class="col-md-6"><label class="form-label small">Industry</label><input class="form-control form-control-sm" id="orgIndustry" value="${existing?.industry||''}"></div>
+              <div class="col-md-6"><label class="form-label small">Sub-industry</label><input class="form-control form-control-sm" id="orgSubIndustry" value="${existing?.subIndustry||''}"></div>
+              <div class="col-md-4"><label class="form-label small">City*</label><select class="form-select form-select-sm" id="orgCity"><option>Harar</option><option>Dire Dawa</option><option>Jigjiga</option><option>Other</option></select></div>
+              <div class="col-md-4"><label class="form-label small">Region</label><input class="form-control form-control-sm" id="orgRegion" value="${existing?.region||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Phone</label><input class="form-control form-control-sm" id="orgPhone" value="${existing?.phone||''}"></div>
+              <div class="col-md-4"><label class="form-label small">WhatsApp</label><input class="form-control form-control-sm" id="orgWhatsapp" value="${existing?.whatsapp||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Email</label><input class="form-control form-control-sm" id="orgEmail" value="${existing?.email||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Website</label><input class="form-control form-control-sm" id="orgWebsite" value="${existing?.website||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Employees</label><input class="form-control form-control-sm" id="orgEmployees" value="${existing?.employees||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Decision Maker Name</label><input class="form-control form-control-sm" id="orgDMName" value="${existing?.dmName||''}"></div>
+              <div class="col-md-4"><label class="form-label small">DM Position</label><input class="form-control form-control-sm" id="orgDMPosition" value="${existing?.dmPosition||''}"></div>
+              <div class="col-md-4"><label class="form-label small">DM Phone</label><input class="form-control form-control-sm" id="orgDMPhone" value="${existing?.dmPhone||''}"></div>
+              <div class="col-md-4"><label class="form-label small">DM Email</label><input class="form-control form-control-sm" id="orgDMEmail" value="${existing?.dmEmail||''}"></div>
+            </div>`;
+            openModal(existing ? 'Edit Organization' : 'Add Organization', body, () => {
+                const data = {
+                    id: existing?.id || generateId(),
+                    name: getModalValue('orgName'),
+                    orgType: getModalValue('orgType'),
+                    industry: getModalValue('orgIndustry'),
+                    subIndustry: getModalValue('orgSubIndustry'),
+                    city: getModalValue('orgCity'),
+                    region: getModalValue('orgRegion'),
+                    phone: getModalValue('orgPhone'),
+                    whatsapp: getModalValue('orgWhatsapp'),
+                    email: getModalValue('orgEmail'),
+                    website: getModalValue('orgWebsite'),
+                    employees: getModalValue('orgEmployees'),
+                    dmName: getModalValue('orgDMName'),
+                    dmPosition: getModalValue('orgDMPosition'),
+                    dmPhone: getModalValue('orgDMPhone'),
+                    dmEmail: getModalValue('orgDMEmail'),
+                    digitalReadiness: existing?.digitalReadiness || 0,
+                    createdAt: existing?.createdAt || new Date().toISOString()
+                };
+                if (!data.name) { showToast('Organization name is required.', 'error'); return; }
+                const dup = appData.organizations.find(o => o.name.toLowerCase() === data.name.toLowerCase() && o
+                    .id !== data.id);
+                if (dup) { showToast('Duplicate organization detected.', 'error'); return; }
+                if (existing) {
+                    const idx = appData.organizations.findIndex(o => o.id === existing.id);
+                    if (idx >= 0) appData.organizations[idx] = data;
+                } else { appData.organizations.push(data); }
+                saveData();
+                renderOrgTable();
+                showToast('Organization saved.');
+            });
+        }
+
+        function editOrg(id) { openOrgModal(id); }
+
+        function deleteOrg(id) {
+            if (!confirm('Delete this organization? This cannot be undone.')) return;
+            appData.organizations = appData.organizations.filter(o => o.id !== id);
+            appData.problems = appData.problems.filter(p => p.orgId !== id);
+            appData.opportunities = appData.opportunities.filter(o => o.orgId !== id);
+            saveData();
+            renderOrgTable();
+            showToast('Organization deleted.', 'error');
+        }
+
+        // ==================== MARKET RESEARCH ====================
+        function renderResearch() {
+            document.getElementById('resOrg').innerHTML = '<option value="">Select Organization</option>' + appData
+                .organizations.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+            const tbody = document.querySelector('#researchTable tbody');
+            tbody.innerHTML = appData.research.map(r => {
+                const org = appData.organizations.find(o => o.id === r.orgId);
+                return `
+            <tr>
+              <td>${org?.name||r.orgId}</td><td>${r.researcher||''}</td><td>${r.date||''}</td><td>${r.location||''}</td>
+              <td>${r.industry||''}</td><td>${(r.problem||'').substring(0,50)}...</td>
+              <td><button class="btn btn-sm btn-outline-danger btn-soft" onclick="deleteResearch('${r.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+            }).join('');
+            if (appData.research.length === 0) tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center text-muted py-3">No research records yet.</td></tr>';
+        }
+
+        function submitResearch(e) {
+            e.preventDefault();
+            const data = {
+                id: generateId(),
+                orgId: getModalValue('resOrg'),
+                researcher: getModalValue('resResearcher'),
+                date: getModalValue('resDate'),
+                location: getModalValue('resLocation'),
+                industry: getModalValue('resIndustry'),
+                operations: getModalValue('resOps'),
+                problem: getModalValue('resProblem'),
+                frequency: getModalValue('resFreq'),
+                severity: getModalValue('resSeverity'),
+                createdAt: new Date().toISOString()
+            };
+            appData.research.push(data);
+            saveData();
+            renderResearch();
+            document.getElementById('researchForm').reset();
+            showToast('Research record saved.');
+        }
+
+        function deleteResearch(id) { appData.research = appData.research.filter(r => r.id !== id);
+            saveData();
+            renderResearch();
+            showToast('Deleted.'); }
+
+        // ==================== DIGITAL ASSESSMENT ====================
+        const assessmentCategories = ['Website', 'Google Maps', 'Social Media', 'SEO', 'Branding', 'Customer Communication',
+            'Online Booking', 'Digital Payment', 'Customer Management', 'Data Management', 'Automation', 'Analytics'
+        ];
+
+        function renderAssessmentView() {
+            document.getElementById('assessOrg').innerHTML = '<option value="">Choose organization...</option>' + appData
+                .organizations.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+        }
+
+        function loadAssessment() {
+            const orgId = getModalValue('assessOrg');
+            const existing = appData.assessments.find(a => a.orgId === orgId);
+            const form = document.getElementById('assessmentForm');
+            form.innerHTML = assessmentCategories.map((cat, i) => `
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="small">${cat}</span>
+              <input type="range" class="form-range" min="0" max="100" value="${existing?.scores?.[cat]??0}" id="assess_${i}" style="width:150px;" oninput="this.nextElementSibling.textContent=this.value">
+              <span class="small fw-bold" style="width:35px;">${existing?.scores?.[cat]??0}</span>
+            </div>`).join('');
+            if (existing) showAssessmentResult(existing);
+        }
+
+        function saveAssessment() {
+            const orgId = getModalValue('assessOrg');
+            if (!orgId) { showToast('Select an organization.', 'error'); return; }
+            const scores = {};
+            assessmentCategories.forEach((cat, i) => { scores[cat] = parseInt(document.getElementById('assess_' + i)?.value ||
+                    0); });
+            const total = Object.values(scores).reduce((s, v) => s + v, 0);
+            const readiness = Math.round(total / assessmentCategories.length);
+            let classification = 'Emerging';
+            if (readiness > 80) classification = 'Mature';
+            else if (readiness > 60) classification = 'Active';
+            else if (readiness > 40) classification = 'Developing';
+            else if (readiness > 20) classification = 'Basic';
+            const existingIdx = appData.assessments.findIndex(a => a.orgId === orgId);
+            const data = { id: existingIdx >= 0 ? appData.assessments[existingIdx].id : generateId(), orgId, scores, readiness,
+                classification, createdAt: new Date().toISOString() };
+            if (existingIdx >= 0) appData.assessments[existingIdx] = data;
+            else appData.assessments.push(data);
+            const org = appData.organizations.find(o => o.id === orgId);
+            if (org) org.digitalReadiness = readiness;
+            saveData();
+            showAssessmentResult(data);
+            showToast('Assessment saved. Score: ' + readiness + '/100');
+            renderOrgTable();
+        }
+
+        function showAssessmentResult(data) {
+            const weakAreas = Object.entries(data.scores).filter(([, v]) => v < 40).sort(([, a], [, b]) => a - b);
+            document.getElementById('assessmentResult').innerHTML = `
+            <h6 class="fw-semibold">Digital Readiness: <span class="fw-bold">${data.readiness}/100</span> — <span class="badge-status" style="background:${data.readiness>60?'#059669':data.readiness>30?'#d97706':'#dc2626'}20;color:${data.readiness>60?'#059669':data.readiness>30?'#d97706':'#dc2626'};">${data.classification}</span></h6>
+            <div class="readiness-bar mb-3"><div class="readiness-fill" style="width:${data.readiness}%;background:${data.readiness>60?'#059669':data.readiness>30?'#d97706':'#dc2626'};"></div></div>
+            <h6 class="fw-semibold">Priority Recommendations</h6>
+            ${weakAreas.length>0?weakAreas.map(([k,v])=>`<div class="d-flex justify-content-between small mb-1"><span>${k}</span><span class="text-danger fw-semibold">${v}/100 — High Priority</span></div>`).join(''):'<p class="text-success small">All areas are adequately covered.</p>'}
+          `;
+        }
+
+        // ==================== PROBLEMS ====================
+        function renderProblemTable() {
+            const tbody = document.querySelector('#problemTable tbody');
+            tbody.innerHTML = appData.problems.map(p => {
+                const org = appData.organizations.find(o => o.id === p.orgId);
+                return `
+            <tr>
+              <td>${org?.name||p.orgId}</td><td>${p.title||''}</td><td>${p.industry||''}</td><td>${p.city||''}</td>
+              <td><span class="badge-status" style="background:${p.urgency==='Critical'?'#dc2626':p.urgency==='High'?'#d97706':'#059669'}20;color:${p.urgency==='Critical'?'#dc2626':p.urgency==='High'?'#d97706':'#059669'};">${p.urgency||'Medium'}</span></td>
+              <td>${p.status||'Identified'}</td>
+              <td><button class="btn btn-sm btn-outline-secondary btn-soft" onclick="editProblem('${p.id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger btn-soft" onclick="deleteProblem('${p.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+            }).join('');
+            if (appData.problems.length === 0) tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center text-muted py-3">No problems recorded.</td></tr>';
+        }
+
+        function openProblemModal(editId = null) {
+            const existing = editId ? appData.problems.find(p => p.id === editId) : null;
+            const body = `
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Organization*</label><select class="form-select form-select-sm" id="probOrg">${appData.organizations.map(o=>`<option value="${o.id}" ${existing?.orgId===o.id?'selected':''}>${o.name}</option>`).join('')}</select></div>
+              <div class="col-md-6"><label class="form-label small">Title*</label><input class="form-control form-control-sm" id="probTitle" value="${existing?.title||''}" required></div>
+              <div class="col-md-6"><label class="form-label small">Industry</label><input class="form-control form-control-sm" id="probIndustry" value="${existing?.industry||''}"></div>
+              <div class="col-md-6"><label class="form-label small">City</label><input class="form-control form-control-sm" id="probCity" value="${existing?.city||''}"></div>
+              <div class="col-12"><label class="form-label small">Description</label><textarea class="form-control form-control-sm" id="probDesc" rows="3">${existing?.description||''}</textarea></div>
+              <div class="col-md-4"><label class="form-label small">Urgency</label><select class="form-select form-select-sm" id="probUrgency"><option>Low</option><option>Medium</option><option selected>High</option><option>Critical</option></select></div>
+              <div class="col-md-4"><label class="form-label small">Frequency</label><input class="form-control form-control-sm" id="probFreq" value="${existing?.frequency||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Status</label><select class="form-select form-select-sm" id="probStatus"><option>Identified</option><option>Validating</option><option>Validated</option><option>Converted to Opportunity</option><option>Rejected</option><option>Resolved</option></select></div>
+              <div class="col-md-6"><label class="form-label small">Affected Users</label><input class="form-control form-control-sm" id="probUsers" value="${existing?.affectedUsers||''}"></div>
+              <div class="col-md-6"><label class="form-label small">Est. Cost/Time Loss</label><input class="form-control form-control-sm" id="probCost" value="${existing?.estCost||''}"></div>
+            </div>`;
+            openModal(existing ? 'Edit Problem' : 'Add Business Problem', body, () => {
+                const data = {
+                    id: existing?.id || generateId(),
+                    orgId: getModalValue('probOrg'),
+                    title: getModalValue('probTitle'),
+                    industry: getModalValue('probIndustry'),
+                    city: getModalValue('probCity'),
+                    description: getModalValue('probDesc'),
+                    urgency: getModalValue('probUrgency'),
+                    frequency: getModalValue('probFreq'),
+                    status: getModalValue('probStatus'),
+                    affectedUsers: getModalValue('probUsers'),
+                    estCost: getModalValue('probCost'),
+                    createdAt: existing?.createdAt || new Date().toISOString()
+                };
+                if (!data.title) { showToast('Title required.', 'error'); return; }
+                if (existing) {
+                    const idx = appData.problems.findIndex(p => p.id === existing.id);
+                    if (idx >= 0) appData.problems[idx] = data;
+                } else appData.problems.push(data);
+                saveData();
+                renderProblemTable();
+                showToast('Problem saved.');
+            });
+        }
+
+        function editProblem(id) { openProblemModal(id); }
+
+        function deleteProblem(id) { appData.problems = appData.problems.filter(p => p.id !== id);
+            saveData();
+            renderProblemTable();
+            showToast('Deleted.'); }
+
+        // ==================== OPPORTUNITIES ====================
+        function renderOppTable() {
+            const tbody = document.querySelector('#oppTable tbody');
+            tbody.innerHTML = appData.opportunities.map(o => {
+                const org = appData.organizations.find(org => org.id === o.orgId);
+                const weighted = (parseFloat(o.estimatedValue) || 0) * (parseFloat(o.probability) || 0) / 100;
+                return `
+            <tr>
+              <td><strong>${o.name||''}</strong></td><td>${org?.name||o.orgId}</td><td>${o.solutionCategory||''}</td>
+              <td>ETB ${(parseFloat(o.estimatedValue)||0).toLocaleString()}</td>
+              <td>${o.probability||0}%</td><td>ETB ${weighted.toLocaleString()}</td>
+              <td><span class="badge-status bg-${o.stage==='Won'?'success':o.stage==='Lost'?'danger':'primary'}">${o.stage||'New'}</span></td>
+              <td><button class="btn btn-sm btn-outline-secondary btn-soft" onclick="editOpp('${o.id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger btn-soft" onclick="deleteOpp('${o.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+            }).join('');
+            if (appData.opportunities.length === 0) tbody.innerHTML =
+                '<tr><td colspan="8" class="text-center text-muted py-3">No opportunities yet.</td></tr>';
+        }
+
+        function openOppModal(editId = null) {
+            const existing = editId ? appData.opportunities.find(o => o.id === editId) : null;
+            const body = `
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Opportunity Name*</label><input class="form-control form-control-sm" id="oppName" value="${existing?.name||''}" required></div>
+              <div class="col-md-6"><label class="form-label small">Organization*</label><select class="form-select form-select-sm" id="oppOrg">${appData.organizations.map(o=>`<option value="${o.id}" ${existing?.orgId===o.id?'selected':''}>${o.name}</option>`).join('')}</select></div>
+              <div class="col-md-6"><label class="form-label small">Solution Category</label><select class="form-select form-select-sm" id="oppCat"><option>Websites</option><option>Mobile Apps</option><option>Custom Software</option><option>CRM</option><option>ERP</option><option>Booking Systems</option><option>E-commerce</option><option>AI</option><option>Automation</option><option>Data Systems</option><option>GIS</option><option>Digital Marketing</option></select></div>
+              <div class="col-md-6"><label class="form-label small">Estimated Value (ETB)*</label><input class="form-control form-control-sm" type="number" id="oppValue" value="${existing?.estimatedValue||''}" required></div>
+              <div class="col-md-4"><label class="form-label small">Probability (%)</label><input class="form-control form-control-sm" type="number" id="oppProb" value="${existing?.probability||50}" min="0" max="100"></div>
+              <div class="col-md-4"><label class="form-label small">Priority</label><select class="form-select form-select-sm" id="oppPriority"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+              <div class="col-md-4"><label class="form-label small">Stage</label><select class="form-select form-select-sm" id="oppStage"><option>New</option><option>Contacted</option><option>Interested</option><option>Discovery</option><option>Qualified</option><option>Requirements</option><option>Proposal</option><option>Negotiation</option><option>Won</option><option>Lost</option></select></div>
+              <div class="col-12"><label class="form-label small">Description</label><textarea class="form-control form-control-sm" id="oppDesc" rows="2">${existing?.description||''}</textarea></div>
+              <div class="col-md-6"><label class="form-label small">Decision Maker</label><input class="form-control form-control-sm" id="oppDM" value="${existing?.decisionMaker||''}"></div>
+              <div class="col-md-6"><label class="form-label small">Expected Close</label><input class="form-control form-control-sm" type="date" id="oppClose" value="${existing?.expectedClose||''}"></div>
+            </div>`;
+            openModal(existing ? 'Edit Opportunity' : 'Add Opportunity', body, () => {
+                const data = {
+                    id: existing?.id || generateId(),
+                    name: getModalValue('oppName'),
+                    orgId: getModalValue('oppOrg'),
+                    solutionCategory: getModalValue('oppCat'),
+                    estimatedValue: parseFloat(getModalValue('oppValue')) || 0,
+                    probability: parseFloat(getModalValue('oppProb')) || 50,
+                    priority: getModalValue('oppPriority'),
+                    stage: getModalValue('oppStage'),
+                    description: getModalValue('oppDesc'),
+                    decisionMaker: getModalValue('oppDM'),
+                    expectedClose: getModalValue('oppClose'),
+                    createdAt: existing?.createdAt || new Date().toISOString()
+                };
+                if (!data.name) { showToast('Name required.', 'error'); return; }
+                if (existing) {
+                    const idx = appData.opportunities.findIndex(o => o.id === existing.id);
+                    if (idx >= 0) appData.opportunities[idx] = data;
+                } else appData.opportunities.push(data);
+                saveData();
+                renderOppTable();
+                showToast('Opportunity saved.');
+            });
+        }
+
+        function editOpp(id) { openOppModal(id); }
+
+        function deleteOpp(id) { appData.opportunities = appData.opportunities.filter(o => o.id !== id);
+            saveData();
+            renderOppTable();
+            showToast('Deleted.'); }
+
+        // ==================== KANBAN ====================
+        const kanbanStages = ['New', 'Contacted', 'Interested', 'Discovery', 'Qualified', 'Requirements', 'Proposal',
+            'Negotiation', 'Won', 'Lost'
+        ];
+
+        function renderKanban() {
+            const board = document.getElementById('kanbanBoard');
+            board.innerHTML = kanbanStages.map(stage => {
+                const items = appData.opportunities.filter(o => o.stage === stage);
+                const stageValue = items.reduce((s, o) => s + (parseFloat(o.estimatedValue) || 0), 0);
+                return `
+            <div class="kanban-column" data-stage="${stage}" ondragover="event.preventDefault()" ondrop="dropKanban(event,'${stage}')">
+              <h6>${stage} <span class="badge bg-secondary ms-1">${items.length}</span></h6>
+              <small class="d-block text-center text-muted mb-2">ETB ${stageValue.toLocaleString()}</small>
+              ${items.map(o=>`<div class="kanban-card" draggable="true" data-id="${o.id}" ondragstart="dragKanban(event)"><strong>${o.name}</strong><br><small>${o.solutionCategory||''} — ${o.probability||0}%</small><br><small class="text-muted">ETB ${(parseFloat(o.estimatedValue)||0).toLocaleString()}</small></div>`).join('')}
+            </div>`;
+            }).join('');
+        }
+
+        function dragKanban(e) { e.dataTransfer.setData('text/plain', e.target.closest('.kanban-card')?.dataset.id || '');
+            e.target.closest('.kanban-card')?.classList.add('dragging'); }
+
+        function dropKanban(e, stage) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const opp = appData.opportunities.find(o => o.id === id);
+            if (opp) { opp.stage = stage;
+                saveData();
+                renderKanban();
+                renderOppTable();
+                showToast(`Moved to ${stage}`); }
+            document.querySelectorAll('.kanban-card.dragging').forEach(c => c.classList.remove('dragging'));
+        }
+
+        // ==================== REQUIREMENTS ====================
+        function renderRequirementsView() {
+            document.getElementById('reqOpp').innerHTML = '<option value="">Select Opportunity</option>' + appData
+                .opportunities.map(o => `<option value="${o.id}">${o.name} (${o.stage})</option>`).join('');
+        }
+
+        function generateBrief(e) {
+            e.preventDefault();
+            const oppId = getModalValue('reqOpp');
+            const opp = appData.opportunities.find(o => o.id === oppId);
+            const org = opp ? appData.organizations.find(o => o.id === opp.orgId) : null;
+            const brief = `
+            <div class="print-only"><h4>ADAL DIGITAL — Technology Project Requirements Brief</h4></div>
+            <h6>Project: ${getModalValue('reqProject')||'Untitled'}</h6>
+            <p><strong>Client:</strong> ${org?.name||'N/A'}</p>
+            <p><strong>Business Problem:</strong> ${getModalValue('reqProblem')||'N/A'}</p>
+            <p><strong>Objectives:</strong> ${getModalValue('reqObjectives')||'N/A'}</p>
+            <p><strong>Target Users:</strong> ${getModalValue('reqUsers')||'N/A'}</p>
+            <p><strong>Platform:</strong> ${getModalValue('reqPlatform')||'N/A'}</p>
+            <p><strong>Core Features:</strong> ${getModalValue('reqFeatures')||'N/A'}</p>
+            <p><strong>Budget:</strong> ETB ${getModalValue('reqBudget')||'TBD'}</p>
+            <p><strong>Timeline:</strong> ${getModalValue('reqTimeline')||'TBD'}</p>
+            <p><strong>Opportunity Value:</strong> ETB ${(parseFloat(opp?.estimatedValue)||0).toLocaleString()} | Probability: ${opp?.probability||0}%</p>
+            <hr><small>Generated by Adal Digital — ${new Date().toLocaleDateString()}</small>
+          `;
+            document.getElementById('briefOutput').innerHTML = brief;
+            const reqData = { id: generateId(), oppId, projectName: getModalValue('reqProject'), brief: brief.replace(/<[^>]*>/g,
+                    ''), createdAt: new Date().toISOString() };
+            appData.requirements.push(reqData);
+            saveData();
+            showToast('Requirements brief generated.');
+        }
+
+        // ==================== PARTNERS ====================
+        function renderPartnerTable() {
+            const tbody = document.querySelector('#partnerTable tbody');
+            tbody.innerHTML = appData.partners.map(p => `
+            <tr>
+              <td>${p.name||''}</td><td>${p.company||''}</td><td>${p.specialization||''}</td><td>${p.country||''}</td>
+              <td>${p.reliability||'N/A'}/10</td>
+              <td><button class="btn btn-sm btn-outline-secondary btn-soft" onclick="matchPartner('${p.id}')">Match</button></td>
+              <td><button class="btn btn-sm btn-outline-secondary btn-soft" onclick="editPartner('${p.id}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-danger btn-soft" onclick="deletePartner('${p.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`).join('');
+            if (appData.partners.length === 0) tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center text-muted py-3">No partners added.</td></tr>';
+        }
+
+        function openPartnerModal(editId = null) {
+            const existing = editId ? appData.partners.find(p => p.id === editId) : null;
+            const body = `
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Name*</label><input class="form-control form-control-sm" id="partName" value="${existing?.name||''}" required></div>
+              <div class="col-md-6"><label class="form-label small">Company</label><input class="form-control form-control-sm" id="partCompany" value="${existing?.company||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Country</label><input class="form-control form-control-sm" id="partCountry" value="${existing?.country||''}"></div>
+              <div class="col-md-4"><label class="form-label small">City</label><input class="form-control form-control-sm" id="partCity" value="${existing?.city||''}"></div>
+              <div class="col-md-4"><label class="form-label small">Website</label><input class="form-control form-control-sm" id="partWeb" value="${existing?.website||''}"></div>
+              <div class="col-md-6"><label class="form-label small">Specialization</label><select class="form-select form-select-sm" id="partSpec"><option>Web Development</option><option>Mobile Development</option><option>AI</option><option>UI/UX</option><option>Cloud</option><option>Cybersecurity</option><option>Data</option><option>GIS</option><option>ERP</option><option>CRM</option><option>Fintech</option><option>Automation</option><option>E-commerce</option></select></div>
+              <div class="col-md-3"><label class="form-label small">Reliability (1-10)</label><input class="form-control form-control-sm" type="number" id="partRel" value="${existing?.reliability||7}" min="1" max="10"></div>
+              <div class="col-md-3"><label class="form-label small">Tech Capability (1-10)</label><input class="form-control form-control-sm" type="number" id="partTech" value="${existing?.techCapability||7}" min="1" max="10"></div>
+            </div>`;
+            openModal(existing ? 'Edit Partner' : 'Add Technology Partner', body, () => {
+                const data = {
+                    id: existing?.id || generateId(),
+                    name: getModalValue('partName'),
+                    company: getModalValue('partCompany'),
+                    country: getModalValue('partCountry'),
+                    city: getModalValue('partCity'),
+                    website: getModalValue('partWeb'),
+                    specialization: getModalValue('partSpec'),
+                    reliability: parseInt(getModalValue('partRel')) || 7,
+                    techCapability: parseInt(getModalValue('partTech')) || 7,
+                    createdAt: existing?.createdAt || new Date().toISOString()
+                };
+                if (!data.name) { showToast('Name required.', 'error'); return; }
+                if (existing) {
+                    const idx = appData.partners.findIndex(p => p.id === existing.id);
+                    if (idx >= 0) appData.partners[idx] = data;
+                } else appData.partners.push(data);
+                saveData();
+                renderPartnerTable();
+                showToast('Partner saved.');
+            });
+        }
+
+        function editPartner(id) { openPartnerModal(id); }
+
+        function deletePartner(id) { appData.partners = appData.partners.filter(p => p.id !== id);
+            saveData();
+            renderPartnerTable();
+            showToast('Deleted.'); }
+
+        function matchPartner(partnerId) {
+            const partner = appData.partners.find(p => p.id === partnerId);
+            if (!partner) return;
+            const opps = appData.opportunities.filter(o => !['Won', 'Lost'].includes(o.stage));
+            const matches = opps.map(o => {
+                let score = 50;
+                if (o.solutionCategory && partner.specialization && o.solutionCategory.toLowerCase()
+                    .includes(partner.specialization.toLowerCase())) score += 25;
+                score += Math.random() * 20;
+                return { ...o, matchScore: Math.min(99, Math.round(score)) };
+            }).sort((a, b) => b.matchScore - a.matchScore).slice(0, 5);
+            document.getElementById('matchResults').innerHTML = `
+            <h6 class="fw-semibold">Recommended Partners for Opportunities</h6>
+            <p><strong>Partner:</strong> ${partner.name} (${partner.specialization})</p>
+            ${matches.map(m=>`<div class="d-flex justify-content-between small mb-1"><span>${m.name}</span><span class="fw-bold">${m.matchScore}% Match</span></div>`).join('')}
+            ${matches.length===0?'<p class="text-muted">No matching opportunities found.</p>':''}
+          `;
+        }
+
+        // ==================== CAMPAIGNS ====================
+        function renderCampaigns() {
+            const tbody = document.querySelector('#campaignTable tbody');
+            const defaultCampaigns = ['Hospitality Digital Transformation', 'Eastern Ethiopia SME Digitalization',
+                'NGO Data Systems', 'Manufacturing Automation'
+            ];
+            appData.campaigns = defaultCampaigns.map((name, i) => {
+                const existing = appData.campaigns.find(c => c.name === name);
+                const opps = appData.opportunities;
+                const contacted = opps.filter(o => ['Contacted', 'Interested', 'Discovery', 'Qualified',
+                    'Requirements', 'Proposal', 'Negotiation', 'Won'
+                ].includes(o.stage)).length;
+                const won = opps.filter(o => o.stage === 'Won').length;
+                const proposals = opps.filter(o => o.stage === 'Proposal').length;
+                const revenue = opps.filter(o => o.stage === 'Won').reduce((s, o) => s + (parseFloat(o
+                    .estimatedValue) || 0), 0);
+                return {
+                    id: existing?.id || generateId(),
+                    name,
+                    target: (existing?.target || 20 + i * 8),
+                    contacted: contacted || (existing?.contacted || 0),
+                    responses: (existing?.responses || Math.floor(contacted * 0.6)),
+                    qualified: (existing?.qualified || Math.floor(contacted * 0.3)),
+                    proposals: proposals || (existing?.proposals || 0),
+                    won: won || (existing?.won || 0),
+                    revenue: revenue || (existing?.revenue || 0)
+                };
+            });
+            appData.campaigns.forEach((c, i) => { if (!c.id) c.id = generateId(); });
+            saveData();
+            tbody.innerHTML = appData.campaigns.map(c => {
+                const convRate = c.contacted > 0 ? Math.round((c.won / c.contacted) * 100) : 0;
+                return `
+            <tr>
+              <td><strong>${c.name}</strong></td><td>${c.target}</td><td>${c.contacted}</td><td>${c.responses}</td>
+              <td>${c.qualified}</td><td>${c.proposals}</td><td>${c.won}</td>
+              <td>ETB ${c.revenue.toLocaleString()}</td><td>${convRate}%</td>
+            </tr>`;
+            }).join('');
+        }
+
+        // ==================== TASKS ====================
+        function renderTaskTable() {
+            const tbody = document.querySelector('#taskTable tbody');
+            tbody.innerHTML = appData.tasks.map(t => {
+                const org = appData.organizations.find(o => o.id === t.orgId);
+                const opp = appData.opportunities.find(o => o.id === t.oppId);
+                return `
+            <tr>
+              <td>${t.title||''}</td><td>${org?.name||''}</td><td>${opp?.name||''}</td><td>${t.dueDate||''}</td>
+              <td><span class="badge-status" style="background:${t.priority==='High'?'#dc2626':t.priority==='Medium'?'#d97706':'#059669'}20;color:${t.priority==='High'?'#dc2626':t.priority==='Medium'?'#d97706':'#059669'};">${t.priority||'Medium'}</span></td>
+              <td>${t.status||'Pending'}</td>
+              <td><button class="btn btn-sm btn-outline-danger btn-soft" onclick="deleteTask('${t.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+            }).join('');
+            if (appData.tasks.length === 0) tbody.innerHTML =
+                '<tr><td colspan="7" class="text-center text-muted py-3">No tasks yet.</td></tr>';
+        }
+
+        function openTaskModal() {
+            const body = `
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Task*</label><input class="form-control form-control-sm" id="taskTitle" required></div>
+              <div class="col-md-6"><label class="form-label small">Organization</label><select class="form-select form-select-sm" id="taskOrg"><option value="">None</option>${appData.organizations.map(o=>`<option value="${o.id}">${o.name}</option>`).join('')}</select></div>
+              <div class="col-md-6"><label class="form-label small">Opportunity</label><select class="form-select form-select-sm" id="taskOpp"><option value="">None</option>${appData.opportunities.map(o=>`<option value="${o.id}">${o.name}</option>`).join('')}</select></div>
+              <div class="col-md-3"><label class="form-label small">Due Date</label><input class="form-control form-control-sm" type="date" id="taskDate"></div>
+              <div class="col-md-3"><label class="form-label small">Priority</label><select class="form-select form-select-sm" id="taskPriority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+            </div>`;
+            openModal('Add Task', body, () => {
+                appData.tasks.push({ id: generateId(), title: getModalValue('taskTitle'), orgId: getModalValue(
+                        'taskOrg'), oppId: getModalValue('taskOpp'), dueDate: getModalValue('taskDate'),
+                    priority: getModalValue('taskPriority'), status: 'Pending', createdAt: new Date()
+                        .toISOString() });
+                saveData();
+                renderTaskTable();
+                showToast('Task added.');
+            });
+        }
+
+        function deleteTask(id) { appData.tasks = appData.tasks.filter(t => t.id !== id);
+            saveData();
+            renderTaskTable();
+            showToast('Deleted.'); }
+
+        // ==================== REPORTS ====================
+        function renderReports() {
+            const reportTypes = ['Daily Activity Report', 'Weekly Business Development Report',
+                'Monthly Market Intelligence Report', 'Digital Readiness Report', 'Opportunity Pipeline Report',
+                'Industry Demand Report', 'City Demand Report', 'Revenue Pipeline Report'
+            ];
+            document.getElementById('reportCards').innerHTML = reportTypes.map(r => `
+            <div class="col-md-4 col-lg-3"><div class="card-stat text-center" style="cursor:pointer;" onclick="generateReport('${r}')">
+              <i class="fas fa-file-alt fa-2x mb-2" style="color:var(--accent);"></i>
+              <div class="stat-label">${r}</div>
+              <small class="text-muted">Click to generate</small>
+            </div></div>`).join('');
+        }
+
+        function generateReport(type) {
+            const orgs = appData.organizations;
+            const opps = appData.opportunities;
+            const problems = appData.problems;
+            const pipelineValue = opps.filter(o => !['Won', 'Lost'].includes(o.stage)).reduce((s, o) => s + (parseFloat(o
+                .estimatedValue) || 0), 0);
+            const wonRevenue = opps.filter(o => o.stage === 'Won').reduce((s, o) => s + (parseFloat(o.estimatedValue) || 0),
+            0);
+            const avgReadiness = orgs.length > 0 ? Math.round(orgs.reduce((s, o) => s + (o.digitalReadiness || 0), 0) / orgs
+                .length) : 0;
+            const html = `
+            <h4>ADAL DIGITAL — ${type}</h4><p>Generated: ${new Date().toLocaleString()}</p><hr>
+            <div class="row"><div class="col-sm-4"><strong>Organizations:</strong> ${orgs.length}</div>
+            <div class="col-sm-4"><strong>Active Opportunities:</strong> ${opps.filter(o=>!['Won','Lost'].includes(o.stage)).length}</div>
+            <div class="col-sm-4"><strong>Pipeline Value:</strong> ETB ${pipelineValue.toLocaleString()}</div></div>
+            <div class="row mt-2"><div class="col-sm-4"><strong>Won Revenue:</strong> ETB ${wonRevenue.toLocaleString()}</div>
+            <div class="col-sm-4"><strong>Avg Digital Readiness:</strong> ${avgReadiness}/100</div>
+            <div class="col-sm-4"><strong>Problems Identified:</strong> ${problems.length}</div></div>
+            <hr><h6>Observations</h6><ul>
+              <li>${orgs.filter(o=>!o.digitalReadiness||o.digitalReadiness<40).length} organizations have low digital readiness (below 40/100).</li>
+              <li>Top demanded solution: ${getTopSolution(opps)}</li>
+              <li>City with most opportunities: ${getTopCity(orgs)}</li>
+            </ul>
+            <p><strong>Recommended Actions:</strong> Prioritize outreach to organizations with low digital readiness scores. Focus on ${getTopSolution(opps)} solutions in ${getTopCity(orgs)}.</p>
+          `;
+            document.getElementById('reportPreview').innerHTML =
+                `<h6>${type}</h6><div class="border p-3 rounded">${html}</div><button class="btn btn-sm btn-soft mt-2" style="background:var(--primary);color:#fff;" onclick="window.print()"><i class="fas fa-print me-1"></i> Print / Save PDF</button>`;
+            document.getElementById('printReport').innerHTML = html;
+        }
+
+        function getTopSolution(opps) {
+            const counts = {};
+            opps.forEach(o => { const c = o.solutionCategory || 'Unknown';
+                counts[c] = (counts[c] || 0) + 1; });
+            return Object.entries(counts).sort(([, a], [, b]) => b - a)[0]?.[0] || 'N/A';
+        }
+
+        function getTopCity(orgs) {
+            const counts = {};
+            orgs.forEach(o => { const c = o.city || 'Unknown';
+                counts[c] = (counts[c] || 0) + 1; });
+            return Object.entries(counts).sort(([, a], [, b]) => b - a)[0]?.[0] || 'N/A';
+        }
+
+        // ==================== MARKET INTELLIGENCE ====================
+        function renderMarketIntel() {
+            const orgs = appData.organizations;
+            const opps = appData.opportunities;
+            const problems = appData.problems;
+            const noWebsite = orgs.filter(o => !o.website || o.website.trim() === '').length;
+            const lowReadiness = orgs.filter(o => (o.digitalReadiness || 0) < 40).length;
+            const totalValue = opps.reduce((s, o) => s + (parseFloat(o.estimatedValue) || 0), 0);
+            document.getElementById('marketIntelStats').innerHTML = [
+                { label: 'Businesses Without Websites', val: noWebsite, color: '#dc2626' },
+                { label: 'Low Digital Readiness (<40)', val: lowReadiness, color: '#d97706' },
+                { label: 'Total Opportunity Value', val: 'ETB ' + totalValue.toLocaleString(), color: '#059669' },
+                { label: 'Problems Identified', val: problems.length, color: '#1e3a5f' },
+            ].map(s => `
+            <div class="col-md-3 col-sm-6"><div class="card-stat text-center"><div class="stat-value" style="color:${s.color};">${s.val}</div><div class="stat-label">${s.label}</div></div></div>
+          `).join('');
+
+            const probInd = {};
+            problems.forEach(p => { const ind = p.industry || 'Unknown';
+                probInd[ind] = (probInd[ind] || 0) + 1; });
+            destroyChart('probInd');
+            destroyChart('maturity');
+            const ctx5 = document.getElementById('chartProblemsIndustry')?.getContext('2d');
+            if (ctx5) chartInstances['probInd'] = new Chart(ctx5, { type: 'bar', data: { labels: Object.keys(probInd),
+                    datasets: [{ label: 'Problems', data: Object.values(probInd),
+                        backgroundColor: '#d97706' }] }, options: { responsive: true,
+                    plugins: { legend: { display: false } } } });
+            const maturityDist = { 'Emerging (0-20)': orgs.filter(o => (o.digitalReadiness || 0) <= 20).length,
+                'Basic (21-40)': orgs.filter(o => (o.digitalReadiness || 0) > 20 && (o.digitalReadiness || 0) <= 40)
+                .length, 'Developing (41-60)': orgs.filter(o => (o.digitalReadiness || 0) > 40 && (o.digitalReadiness ||
+                    0) <= 60).length, 'Active (61-80)': orgs.filter(o => (o.digitalReadiness || 0) > 60 && (o
+                    .digitalReadiness || 0) <= 80).length, 'Mature (81-100)': orgs.filter(o => (o.digitalReadiness ||
+                    0) > 80).length };
+            const ctx6 = document.getElementById('chartMaturity')?.getContext('2d');
+            if (ctx6) chartInstances['maturity'] = new Chart(ctx6, { type: 'pie', data: { labels: Object.keys(maturityDist),
+                    datasets: [{ data: Object.values(maturityDist),
+                        backgroundColor: ['#dc2626', '#d97706', '#f59e0b', '#14b8a6', '#059669'] }] },
+                options: { responsive: true } });
+
+            const catSummary = {};
+            opps.forEach(o => { const c = o.solutionCategory || 'Other';
+                if (!catSummary[c]) catSummary[c] = { count: 0, value: 0, readinessTotal: 0,
+                    readinessCount: 0 };
+                catSummary[c].count++;
+                catSummary[c].value += parseFloat(o.estimatedValue) || 0;
+                const org = orgs.find(org => org.id === o.orgId);
+                if (org?.digitalReadiness) { catSummary[c].readinessTotal += org.digitalReadiness;
+                    catSummary[c].readinessCount++; }
+            });
+            document.querySelector('#intelTable tbody').innerHTML = Object.entries(catSummary).map(([k, v]) => `
+            <tr><td>${k}</td><td>${v.count}</td><td>ETB ${v.value.toLocaleString()}</td><td>${v.readinessCount>0?Math.round(v.readinessTotal/v.readinessCount):'N/A'}</td></tr>
+          `).join('');
+            if (Object.keys(catSummary).length === 0) document.querySelector('#intelTable tbody').innerHTML =
+                '<tr><td colspan="4" class="text-center text-muted">No data available.</td></tr>';
+        }
+
+        // ==================== EXPORT / IMPORT ====================
+        function exportAllJSON() {
+            const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'adal_digital_backup_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data exported as JSON.');
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.organizations && data.opportunities) {
+                        appData = data;
+                        saveData();
+                        showToast('Data imported successfully.');
+                        navigateTo('dashboard');
+                    } else { showToast('Invalid backup file.', 'error'); }
+                } catch (err) { showToast('Error parsing file.', 'error'); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function exportCSV(type) {
+            let data, headers;
+            switch (type) {
+                case 'organizations':
+                    data = appData.organizations;
+                    headers = ['name', 'orgType', 'industry', 'city', 'region', 'phone', 'email', 'website',
+                    'digitalReadiness'];
+                    break;
+                case 'opportunities':
+                    data = appData.opportunities;
+                    headers = ['name', 'orgId', 'solutionCategory', 'estimatedValue', 'probability', 'stage', 'priority'];
+                    break;
+                case 'problems':
+                    data = appData.problems;
+                    headers = ['title', 'orgId', 'industry', 'city', 'urgency', 'status', 'description'];
+                    break;
+                case 'partners':
+                    data = appData.partners;
+                    headers = ['name', 'company', 'specialization', 'country', 'city', 'reliability', 'techCapability'];
+                    break;
+                default:
+                    return;
+            }
+            let csv = headers.join(',') + '\n';
+            data.forEach(row => { csv += headers.map(h => '"' + (row[h] || '').toString().replace(/"/g, '""') + '"').join(
+                    ',') + '\n'; });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `adal_${type}_export.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`${type} exported as CSV.`);
+        }
+
+        function clearAllData() {
+            appData = { organizations: [], research: [], assessments: [], problems: [], opportunities: [], partners: [],
+                campaigns: [], tasks: [], requirements: [] };
+            saveData();
+            navigateTo('dashboard');
+            showToast('All data cleared.', 'error');
+        }
+
+        // ==================== DEMO DATA ====================
+        function loadDemoData() {
+            if (appData.organizations.length > 0 && !confirm(
+                    'This will add demo data alongside existing records. Continue?')) return;
+            const demoOrgs = [
+                { id: generateId(), name: 'Harar Grand Hotel', orgType: 'Hotel', industry: 'Hospitality', city: 'Harar',
+                    region: 'Harari', phone: '+251-25-666-0101', email: 'info@harargrand.demo',
+                    website: 'www.harargrandhotel.demo', digitalReadiness: 35, createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Dire Dawa Trading Co.', orgType: 'Business', industry: 'Logistics',
+                    city: 'Dire Dawa', region: 'Dire Dawa', phone: '+251-25-777-0202', email: 'info@ddtrading.demo',
+                    website: '', digitalReadiness: 18, createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Jigjiga University College', orgType: 'School', industry: 'Education',
+                    city: 'Jigjiga', region: 'Somali', phone: '+251-25-888-0303',
+                    email: 'admin@jju.demo', website: 'www.jju.edu.demo', digitalReadiness: 52,
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Eastern Star Restaurant', orgType: 'Restaurant', industry: 'Food Service',
+                    city: 'Harar', region: 'Harari', phone: '+251-91-111-2233', email: '', website: '',
+                    digitalReadiness: 8, createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Shebelle Manufacturing', orgType: 'Manufacturer', industry: 'Manufacturing',
+                    city: 'Dire Dawa', region: 'Dire Dawa', phone: '+251-25-999-0404',
+                    email: 'info@shebellemfg.demo', website: '', digitalReadiness: 25, createdAt: new Date()
+                    .toISOString() },
+                { id: generateId(), name: 'Harar Community NGO', orgType: 'NGO', industry: 'Nonprofit', city: 'Harar',
+                    region: 'Harari', phone: '+251-91-222-3344', email: 'contact@hararngo.demo', website: '',
+                    digitalReadiness: 15, createdAt: new Date().toISOString() },
+            ];
+            demoOrgs.forEach(o => { if (!appData.organizations.find(ex => ex.name === o.name)) appData.organizations.push(
+                o); });
+            const demoOpps = [
+                { id: generateId(), name: 'Hotel Website Modernization', orgId: demoOrgs[0].id, solutionCategory: 'Websites',
+                    estimatedValue: 180000, probability: 70, stage: 'Proposal', priority: 'High',
+                    description: 'Modernize the hotel website with online booking integration.',
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Online Booking System', orgId: demoOrgs[0].id, solutionCategory: 'Booking Systems',
+                    estimatedValue: 250000, probability: 60, stage: 'Qualified', priority: 'Critical',
+                    description: 'Implement a complete online booking and reservation platform.',
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Logistics Tracking Software', orgId: demoOrgs[1].id,
+                    solutionCategory: 'Custom Software', estimatedValue: 420000, probability: 45, stage: 'Discovery',
+                    priority: 'High', description: 'Custom software for tracking shipments across Eastern Ethiopia.',
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'Student Management CRM', orgId: demoOrgs[2].id, solutionCategory: 'CRM',
+                    estimatedValue: 320000, probability: 55, stage: 'Requirements', priority: 'Medium',
+                    description: 'CRM system for managing student records and communications.',
+                    createdAt: new Date().toISOString() },
+            ];
+            demoOpps.forEach(o => { if (!appData.opportunities.find(ex => ex.name === o.name)) appData.opportunities.push(
+                o); });
+            const demoProblems = [
+                { id: generateId(), orgId: demoOrgs[0].id, title: 'Manual reservation management', industry: 'Hospitality',
+                    city: 'Harar', urgency: 'Critical', status: 'Validated',
+                    description: 'Reservations are managed with paper and phone calls. Double bookings occur frequently.',
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), orgId: demoOrgs[1].id, title: 'No shipment tracking', industry: 'Logistics',
+                    city: 'Dire Dawa', urgency: 'High', status: 'Identified',
+                    description: 'Customers cannot track their shipments. Staff use WhatsApp for updates.',
+                    createdAt: new Date().toISOString() },
+            ];
+            demoProblems.forEach(p => { if (!appData.problems.find(ex => ex.title === p.title)) appData.problems.push(p); });
+            const demoPartners = [
+                { id: generateId(), name: 'Ahmed Software Solutions', company: 'Ahmed Software Solutions', country: 'Ethiopia',
+                    city: 'Addis Ababa', specialization: 'Web Development', reliability: 8, techCapability: 9,
+                    createdAt: new Date().toISOString() },
+                { id: generateId(), name: 'East Africa Tech Hub', company: 'East Africa Tech Hub', country: 'Kenya',
+                    city: 'Nairobi', specialization: 'Mobile Development', reliability: 7, techCapability: 8,
+                    createdAt: new Date().toISOString() },
+            ];
+            demoPartners.forEach(p => { if (!appData.partners.find(ex => ex.name === p.name)) appData.partners.push(p); });
+            saveData();
+            navigateTo('dashboard');
+            showToast('Demo data loaded successfully!');
+        }
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            loadData();
+            if (appData.organizations.length === 0 && appData.opportunities.length === 0) {
+                loadDemoData();
+            }
+            navigateTo('dashboard');
+            renderAllRefs();
+        }
+
+        function renderAllRefs() {
+            renderOrgTable();
+            renderResearch();
+            renderAssessmentView();
+            renderProblemTable();
+            renderOppTable();
+            renderKanban();
+            renderRequirementsView();
+            renderPartnerTable();
+            renderCampaigns();
+            renderTaskTable();
+            renderReports();
+            renderMarketIntel();
+        }
+
+        // Handle window resize for sidebar on mobile
+        window.addEventListener('resize', () => { if (window.innerWidth > 991) document.getElementById('sidebar').classList
+                .remove('open'); });
+
+        // Initialize
+        init();
+
+        console.log('ADAL DIGITAL — Eastern Ethiopia Technology Demand Intelligence');
+        console.log('Founder & Director: Guled Hassen');
+        console.log('Platform initialized. Local storage active. Demo data available.');
+        console.log('Creating technology demand by understanding real business problems.');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+    </script>
+</body>
+</html>
